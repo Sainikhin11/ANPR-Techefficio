@@ -1,0 +1,56 @@
+system:
+  gpu_id: 0
+  max_vram_gb: 3.5
+  target_fps: 25
+  debug_mode: false
+
+camera:
+  # Source: 0 for webcam, or path to video file
+  source: "input/VID-20260219-WA0000.mp4"
+  width: 1280
+  height: 720
+  fps: 30
+  buffer_size: 2  # Keep low for real-time
+  reconnect_interval_s: 5
+
+detection:
+  model_path: "models/license_plate_detector.pt" # Updated to specialized LPR model
+  conf_threshold: 0.25 # Lower detection threshold for better recall
+  iou_threshold: 0.45
+  img_size: 640
+
+tracking:
+  tracker_config: "config/bytetrack.yaml"
+  track_buffer: 30
+  match_thresh: 0.8
+
+ocr:
+  lang: 'en'
+  use_angle_cls: false
+  conf_threshold: 0.65 # Relaxed for video
+  # Regex for Indian Plates (Standard: AA 00 AA 0000)
+  # Relaxed to allow partial matches during stabilization if needed
+  regex_pattern: "^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{4}$"
+  stability_frames: 3 # Number of consistent results to lock
+  buffer_size: 10 # Max buffer size per track
+
+database:
+  uri: "postgresql+asyncpg://user:password@localhost:5432/anpr_db"
+  deduplication_timeout_s: 30
+  save_images: true
+  image_storage_path: "data/crops"
+
+paths:
+  input_dir: "input"
+  output_dir: "output"
+
+output:
+  root_dir: "output"
+
+dataset:
+  enabled: true
+
+logging:
+  level: "INFO"
+  file_path: "logs/anpr_system.log"
+  rotation: "10 MB"

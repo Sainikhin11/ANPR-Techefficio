@@ -1,0 +1,75 @@
+# Recommended Configuration for Fine-tuning PaddleOCR on Indian License Plates
+# Apply these changes to your base `ch_PP-OCRv4_rec.yml` file
+
+Optimizer:
+  name: Adam
+  beta1: 0.9
+  beta2: 0.999
+  lr:
+    name: Cosine
+    learning_rate: 0.001
+    warmup_epoch: 5
+
+Architecture:
+  model_type: rec
+  algorithm: SVTR_LCNet
+  Transform:
+  Backbone:
+    name: MobileNetV1Enhance
+    scale: 0.5
+  Head:
+    name: MultiHead
+    head_list:
+      - CTCHead:
+          Dictionary: c:/Users/VaishuNikhil/anpr_system/ocr_dataset/indian_plate_dict.txt
+          fc_decay: 0.00001
+
+Loss:
+  name: MultiLoss
+  loss_config_list:
+    - CTCLoss:
+
+Train:
+  dataset:
+    name: SimpleDataSet
+    data_dir: c:/Users/VaishuNikhil/anpr_system/ocr_dataset
+    label_file_list: [c:/Users/VaishuNikhil/anpr_system/ocr_dataset/train.txt]
+    transforms:
+      - DecodeImage: 
+          img_mode: BGR
+          channel_first: False
+      - RecAug:
+      - MotionBlur: 
+          prob: 0.3
+      - ColorJitter: 
+          prob: 0.3
+      - MultiLabelEncode:
+      - RecResizeImg:
+          image_shape: [3, 48, 320]
+      - KeepKeys:
+          keep_keys: ['image', 'label', 'length']
+  loader:
+    shuffle: True
+    batch_size_per_card: 64
+    drop_last: True
+    num_workers: 4
+
+Eval:
+  dataset:
+    name: SimpleDataSet
+    data_dir: c:/Users/VaishuNikhil/anpr_system/ocr_dataset
+    label_file_list: [c:/Users/VaishuNikhil/anpr_system/ocr_dataset/val.txt]
+    transforms:
+      - DecodeImage: 
+          img_mode: BGR
+          channel_first: False
+      - MultiLabelEncode:
+      - RecResizeImg:
+          image_shape: [3, 48, 320]
+      - KeepKeys:
+          keep_keys: ['image', 'label', 'length']
+  loader:
+    shuffle: False
+    drop_last: False
+    batch_size_per_card: 64
+    num_workers: 4

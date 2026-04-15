@@ -1,0 +1,44 @@
+# environments
+venv/
+anpr_env/
+
+# system
+__pycache__/
+*.pyc
+
+# logs
+logs/
+
+# backup
+unused_files/
+
+# datasets
+dataset/
+data/
+
+# outputs (keep only output_1)
+output/output_2/
+output/output_3/
+
+# binaries (VERY IMPORTANT)
+*.dll
+*.pyd
+
+# local libraries (ROOT CAUSE)
+local_libs/
+PaddleOCR/
+
+# input/output
+input/
+output/
+
+# windows junk
+desktop.ini
+
+# debug images
+*.jpg
+*.png
+*.csv
+
+# failed crops
+failed_crops/
